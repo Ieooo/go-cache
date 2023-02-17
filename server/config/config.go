@@ -14,7 +14,6 @@ type Config struct {
 }
 
 func InitConfig() error {
-	viper.New()
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("conf.yaml")
 	viper.AddConfigPath("./server/etc/")
@@ -24,12 +23,14 @@ func InitConfig() error {
 	}
 	viper.Unmarshal(&Conf)
 
+	return nil
+}
+
+func HotLoad() {
 	go func() {
 		viper.WatchConfig()
 		viper.OnConfigChange(func(in fsnotify.Event) {
 			InitConfig()
 		})
 	}()
-
-	return nil
 }

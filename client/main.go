@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/urfave/cli/v2"
@@ -49,19 +52,60 @@ func cmdDel() *cli.Command {
 }
 
 func get(c *cli.Context) error {
-	key := c.Args().Get(0)
-	fmt.Println(key)
+	params := map[string]string{
+		"k": c.Args().Get(0),
+	}
+	client := NewClient()
+	v := client.Get("http://127.0.0.1:9000/cache/"+"get", params)
+	fmt.Println(string(v))
 	return nil
 }
 
 func set(c *cli.Context) error {
-	key := c.Args().Get(0)
-	value := c.Args().Get(1)
-	fmt.Println(key, value)
+	params := map[string]string{
+		"k": c.Args().Get(0),
+		"v": c.Args().Get(1),
+	}
+	client := NewClient()
+	client.Get("http://127.0.0.1:9000/cache/"+"set", params)
 	return nil
 }
 func delete(c *cli.Context) error {
-	key := c.Args().Get(0)
-	fmt.Println(key)
+	params := map[string]string{
+		"k": c.Args().Get(0),
+	}
+	client := NewClient()
+	client.Get("http://127.0.0.1:9000/cache/"+"del", params)
 	return nil
+}
+
+type client struct {
+	httpClient http.Client
+}
+
+func NewClient() *client {
+	return &client{
+		httpClient: *http.DefaultClient,
+	}
+}
+
+func (h *client) Get(path string, params map[string]string) []byte {
+	query := url.Values{}
+	for k, v := range params {
+		query.Add(k, v)
+	}
+	req, err := http.NewRequest("GET", path, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+	req.URL.RawQuery = query.Encode()
+	res, err := h.httpClient.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return b
 }

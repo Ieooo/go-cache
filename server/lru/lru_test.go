@@ -10,6 +10,7 @@ import (
 func TestLru(t *testing.T) {
 	c := NewCache(12)
 	c.Set("key1", value.StrValue("value1"))
+	assert.True(t, c.Get("key1").(value.StrValue) == value.String("value1"))
 	c.Set("key2", value.StrValue("value2"))
 	c.Set("key3", value.StrValue("value3"))
 	assert.True(t, c.Get("key1") == nil)

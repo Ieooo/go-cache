@@ -22,7 +22,7 @@ func (h HttpServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	case basePath + "/get":
 		value := core.Get(params.Get("k"))
 		rw.Write([]byte(value))
-	case basePath + "/del":
+	case basePath + "/	del":
 		core.Delete(params.Get("k"))
 	default:
 		rw.Write([]byte("bad request"))

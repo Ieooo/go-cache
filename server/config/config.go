@@ -10,7 +10,9 @@ import (
 var Conf Config
 
 type Config struct {
-	Port string `yaml:"port"`
+	IP   string   `yaml:"ip"`
+	Port string   `yaml:"port"`
+	Peer []string `yaml:"peer"`
 }
 
 func InitConfig() error {

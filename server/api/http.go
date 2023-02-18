@@ -1,11 +1,11 @@
 package api
 
 import (
+	"cache/pkg/log"
 	"cache/server/core"
 	"net/http"
+	"path"
 )
-
-const basePath = "/cache"
 
 type HttpServer struct {
 }
@@ -16,16 +16,26 @@ func NewHttpServer() *HttpServer {
 
 func (h HttpServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	params := req.URL.Query()
+	log.Debugln(req.URL.Path)
+	log.Infof("%v %v %v", path.Base(req.URL.Path), params.Get("k"), params.Get("v"))
 	switch req.URL.Path {
-	case basePath + "/set":
+	case core.BasePath + "/set":
 		core.Set(params.Get("k"), params.Get("v"))
-	case basePath + "/get":
-		value := core.Get(params.Get("k"))
+	case core.BasePath + "/get":
+		value := get(params.Get("k"))
 		rw.Write([]byte(value))
-	case basePath + "/del":
-		core.Delete(params.Get("k"))
+	case core.BasePath + "/del":
+		core.Del(params.Get("k"))
 	default:
 		rw.Write([]byte("bad request"))
 	}
 
+}
+
+func get(key string) string {
+	val, err := core.Get(key)
+	if err != nil {
+		return err.Error()
+	}
+	return val
 }

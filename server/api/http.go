@@ -16,8 +16,7 @@ func NewHttpServer() *HttpServer {
 
 func (h HttpServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	params := req.URL.Query()
-	log.Debugln(req.URL.Path)
-	log.Infof("%v %v %v", path.Base(req.URL.Path), params.Get("k"), params.Get("v"))
+	log.Debugf("%v %v %v", path.Base(req.URL.Path), params.Get("k"), params.Get("v"))
 	switch req.URL.Path {
 	case core.BasePath + "/set":
 		core.Set(params.Get("k"), params.Get("v"))

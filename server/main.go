@@ -51,6 +51,8 @@ func Main(ctx *cli.Context) error {
 		Peers: peers,
 	}
 
+	log.SetLevel(log.InfoLevel)
+
 	if err := config.InitConfig(confPath); err != nil {
 		log.Errorln(err)
 	}
@@ -58,6 +60,7 @@ func Main(ctx *cli.Context) error {
 	log.Infof("Load config:%+v", config.Conf)
 
 	core.InitCache(config.Conf.Peers, crc32.ChecksumIEEE)
+	go core.CheckHealth()
 	log.Infoln("Load core")
 
 	log.Infof("Listen port%v...", config.Conf.Port)

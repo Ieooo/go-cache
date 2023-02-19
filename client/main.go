@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -20,6 +22,7 @@ func main() {
 			cmdSet(),
 			cmdGet(),
 			cmdDel(),
+			cmdScan(),
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
@@ -51,6 +54,15 @@ func cmdDel() *cli.Command {
 	}
 }
 
+func cmdScan() *cli.Command {
+	return &cli.Command{
+		Name:   "scan",
+		Usage:  "scan all value",
+		Flags:  []cli.Flag{},
+		Action: scan,
+	}
+}
+
 func get(c *cli.Context) error {
 	params := map[string]string{
 		"k": c.Args().Get(0),
@@ -79,6 +91,13 @@ func delete(c *cli.Context) error {
 	return nil
 }
 
+func scan(c *cli.Context) error {
+	client := NewClient()
+	res := client.Post("http://127.0.0.1:9000/cache/"+"scan", nil)
+	fmt.Println(string(res))
+	return nil
+}
+
 type client struct {
 	httpClient http.Client
 }
@@ -103,6 +122,34 @@ func (h *client) Get(path string, params map[string]string) []byte {
 	if err != nil {
 		fmt.Println(err)
 	}
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return b
+}
+
+func (h *client) Post(path string, params map[string]string) []byte {
+	var bs []byte
+	if params != nil {
+		var err error
+		bs, err = json.Marshal(params)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	req, err := http.NewRequest("POST", path, bytes.NewReader(bs))
+	if err != nil {
+		fmt.Println(err)
+	}
+	res, err := h.httpClient.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	if res.Body == nil {
+		return nil
+	}
+	defer res.Body.Close()
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println(err)

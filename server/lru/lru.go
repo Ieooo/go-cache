@@ -72,6 +72,16 @@ func (c *Cache) Del(key string) {
 		c.usedBytes -= v.Value.(*kv).value.Len()
 	}
 }
+func (c *Cache) Scan() map[string]value.Value {
+	c.Lock()
+	defer c.Unlock()
+
+	resMap := make(map[string]value.Value, len(c.m))
+	for k, v := range c.m {
+		resMap[k] = v.Value.(*kv).value.(value.StrValue)
+	}
+	return resMap
+}
 
 func (c *Cache) removeOld() {
 	c.Lock()

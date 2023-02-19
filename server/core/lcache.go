@@ -36,3 +36,14 @@ func (l lCache) Del(key string) error {
 	l.dbs[0].Del(key)
 	return nil
 }
+
+func (l lCache) Scan() (map[string]string, error) {
+	m := l.dbs[0].Scan()
+	resMap := make(map[string]string, len(m))
+	for k, v := range m {
+		if v != nil {
+			resMap[k] = v.(value.StrValue).String()
+		}
+	}
+	return resMap, nil
+}

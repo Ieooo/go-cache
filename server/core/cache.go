@@ -6,6 +6,7 @@ import (
 	hash "cache/server/consistanthash"
 	"errors"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type Storage interface {
 	Get(key string) (string, error)
 	Set(key, val string) error
 	Del(key string) error
+	Scan() (map[string]string, error)
 }
 
 type Cache struct {
@@ -49,7 +51,7 @@ func CheckHealth() {
 					cache.storages[v] = NewRCache(v)
 				}
 				cache.nodeMap.SetNode(v)
-				log.Infof("node %v add\n", v)
+				log.Infof("node %v join in\n", v)
 			}
 		}
 		time.Sleep(time.Second)
@@ -101,4 +103,19 @@ func Del(key string) error {
 		return storage.Del(key)
 	}
 	return errors.New("key is expired")
+}
+
+func Scan() (string, error) {
+	var builder strings.Builder
+	for _, v := range cache.storages {
+		m, err := v.Scan()
+		if err != nil {
+			continue
+		}
+		for k, v := range m {
+			builder.WriteString(k + ":" + v + "\n")
+		}
+	}
+	log.Infoln(builder.String())
+	return builder.String(), nil
 }

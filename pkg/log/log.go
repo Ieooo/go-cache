@@ -17,10 +17,10 @@ const (
 )
 
 var (
-	debugLog = log.New(os.Stdout, "\033[34m[debug]\033[0m ", log.LstdFlags|log.Lshortfile)
-	infoLog  = log.New(os.Stdout, "\033[34m[info ]\033[0m ", log.LstdFlags|log.Lshortfile)
-	warnLog  = log.New(os.Stdout, "\033[31m[warn ]\033[0m ", log.LstdFlags|log.Lshortfile)
-	errorLog = log.New(os.Stdout, "\033[31m[error]\033[0m ", log.LstdFlags|log.Lshortfile)
+	debugLog = log.New(os.Stdout, "\033[34m[DEBUG]\033[0m ", log.LstdFlags|log.Lshortfile)
+	infoLog  = log.New(os.Stdout, "\033[34m[INFO ]\033[0m ", log.LstdFlags|log.Lshortfile)
+	warnLog  = log.New(os.Stdout, "\033[33m[WARN ]\033[0m ", log.LstdFlags|log.Lshortfile)
+	errorLog = log.New(os.Stdout, "\033[31m[ERROR]\033[0m ", log.LstdFlags|log.Lshortfile)
 	loggers  = map[LogLevel]*log.Logger{
 		ErrorLevel: errorLog,
 		InfoLevel:  infoLog,

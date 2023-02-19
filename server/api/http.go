@@ -25,6 +25,9 @@ func (h HttpServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		rw.Write([]byte(value))
 	case core.BasePath + "/del":
 		core.Del(params.Get("k"))
+	case core.BasePath + "/scan":
+		val := scan()
+		rw.Write([]byte(val))
 	default:
 		rw.Write([]byte("bad request"))
 	}
@@ -33,6 +36,14 @@ func (h HttpServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 func get(key string) string {
 	val, err := core.Get(key)
+	if err != nil {
+		return err.Error()
+	}
+	return val
+}
+
+func scan() string {
+	val, err := core.Scan()
 	if err != nil {
 		return err.Error()
 	}
